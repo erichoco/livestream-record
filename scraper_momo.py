@@ -112,16 +112,17 @@ def crawl_gifts(gifts):
 
             # Check last 3 gifts crawled (will only show <= 3 gifts on webpage)
             # Update gift count to same gift found
-            for g in gifts[-3:]:
-                if g["name"] + g["gift"] == name + content:
-                    g["count"] = count
-                    break
-            else:
-                new_gifts.append({
-                    "time": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
-                    "name": name,
-                    "gift": content,
-                    "count": count})
+            # for g in gifts[-3:]:
+            #     if g["name"] + g["gift"] == name + content:
+            #         g["count"] = count
+            #         break
+            # else:
+
+            new_gifts.append({
+                "time": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
+                "name": name,
+                "gift": content,
+                "count": count})
 
     except (NoSuchElementException, StaleElementReferenceException):
         # No gift now
