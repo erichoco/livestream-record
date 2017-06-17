@@ -113,10 +113,9 @@ def crawl_gifts(gifts):
 
             # Check last 3 gifts crawled (will only show <= 3 gifts on webpage)
             # Update gift count to same gift found
-            # for g in gifts[-3:]:
-            #     if g["name"] + g["gift"] == name + content:
-            #         g["count"] = count
-            #         break
+            for g in gifts[-3:]:
+                if g["name"] == name and g["gift"] == content and g["count"] == count:
+                    break
             # else:
 
             new_gifts.append({
@@ -227,55 +226,21 @@ def init_csv(info):
 def save_csv(writer, info, new_info):
     timestamp = time.strftime("%m-%d_%H:%M:%S", time.gmtime())
     diff = round(time.time()) - info["start_time"]
-    time_elapsed = "{day}d {hour:02d}:{min:02d}:{sec:02d}".format(
-        day=int(diff//86400),
-        hour=int(diff//3600),
-        min=int(diff//60),
+    time_elapsed = "{hour:02d}:{min:02d}:{sec:02d}".format(
+        hour=int(diff//3600)%3600,
+        min=int((diff//60)%60),
         sec=int(diff%60))
 
     if new_info["view_num"]:
-        writer.writerow([timestamp, time_elapsed, "viewers", new_info["view_num"]["num"]])
+        writer.writerow([timestamp, time_elapsed, "viewers", "", "", new_info["view_num"]["num"]])
     if new_info["star"]:
-        writer.writerow([timestamp, time_elapsed, "stars", new_info["star"]["star"]])
+        writer.writerow([timestamp, time_elapsed, "stars", "", "", new_info["star"]["star"]])
     if new_info["gifts"]:
         for g in new_info["gifts"]:
             writer.writerow([timestamp, time_elapsed, "gift", g["name"], g["gift"], g["count"]])
     if new_info["messages"]:
         for m in new_info["messages"]:
             writer.writerow([timestamp, time_elapsed, "message", m["name"], m["message"]])
-
-def dump_csv(info):
-    # create subfolder
-    path = "./data"
-    if len(info["room_id"]) > 0:
-        path += "-" + str(info["room_id"])
-    if not os.path.exists(path):
-        try:
-            os.makedirs(path)
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
-
-    cur_time = time.strftime("%m-%d_%H:%M:%S", time.gmtime())
-    # save messages
-    with open(path + "/messages_" + cur_time + ".csv", "w", newline="", encoding="utf-8") as csvfile: # python 3
-    # with open(path + "/messages_" + cur_time + ".csv", "w") as csvfile: # python 2
-        fieldnames = ["time", "name", "message"] # should be same as the keys in info["messages"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, restval="")
-
-        writer.writeheader()
-        for m in info["messages"]:
-            writer.writerow(m)
-
-    # save gifts
-    with open(path + "/gifts_" + cur_time + ".csv", "w", newline="", encoding="utf-8") as csvfile: # python 3
-    # with open(path + "/gifts_" + cur_time + ".csv", "w") as csvfile: # python 2
-        fieldnames = ["time", "name", "gift", "count"] # should be same as the keys in info["messages"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, restval="")
-
-        writer.writeheader()
-        for g in info["gifts"]:
-            writer.writerow(g)
 
 def bring_browser_to_front(driver):
     driver.execute_script('alert(1);')
@@ -284,9 +249,21 @@ def bring_browser_to_front(driver):
 def teardown(driver):
     driver.quit()
 
+def check_param(argv):
+    if len(argv) < 2:
+        print("Please provide livestream id.")
+        return False
+    try:
+        val = int(argv[1])
+    except ValueError:
+        return False
+    return True
 
 if __name__ == "__main__":
-    room_url = "https://web.immomo.com/live/366981145?rf=683"
+    if not check_param(sys.argv):
+        exit(0)
+
+    room_url = "https://web.immomo.com/live/" + sys.argv[1] + "?rf=683"
     chat_box_class_name = "live-msg-list"
     # crawl_timeout = 1
 
@@ -328,16 +305,16 @@ if __name__ == "__main__":
                 info, new_info = crawl_info(info)
                 save_csv(writer, info, new_info)
 
+                # press 'q' & return to break
                 if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
                     raise KeyboardInterrupt
 
+
     except KeyboardInterrupt:
-        # dump_csv(info)
         screen.stop()
         teardown(driver)
 
     except Exception as e:
-        # dump_csv(info)
         screen.stop()
         teardown(driver)
         print(e)
