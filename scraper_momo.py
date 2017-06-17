@@ -1,5 +1,6 @@
 import os
 import sys
+import select
 import signal
 import time
 import re
@@ -315,6 +316,7 @@ if __name__ == "__main__":
             writer = csv.writer(csvfile, delimiter=",")
             writer.writerow(["timestamp", "time", "event", "value_1", "value_2", "value_3"])
 
+
             # start crawling chatroom info
             last_sec = time.gmtime()[5]
             while True:
@@ -325,6 +327,9 @@ if __name__ == "__main__":
 
                 info, new_info = crawl_info(info)
                 save_csv(writer, info, new_info)
+
+                if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                    raise KeyboardInterrupt
 
     except KeyboardInterrupt:
         # dump_csv(info)

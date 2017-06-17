@@ -1,6 +1,8 @@
 import pyaudio
 import wave
 import argparse
+import sys
+import select
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -38,6 +40,9 @@ if __name__ == '__main__':
         while True:
             data = stream.read(CHUNK, exception_on_overflow=False)
             frames.append(data)
+
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                raise KeyboardInterrupt
 
     except KeyboardInterrupt:
         stop_save(args.path + "/audio" + args.suffix + ".wav", p, stream, frames)
