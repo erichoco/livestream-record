@@ -67,7 +67,7 @@ if __name__ == '__main__':
             # save every 20 min
             cur_min = time.gmtime()[4]
             over = 60 if cur_min < last_min else 0
-            if (cur_min+over) - last_min > 10:
+            if (cur_min+over) - last_min > 20:
                 last_min = cur_min
                 frames = restart(args.path + "/audio" + args.suffix + "-" + str(count) + ".wav", p, stream, frames)
                 count = count + 1
