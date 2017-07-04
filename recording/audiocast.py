@@ -26,18 +26,6 @@ def save(output, p, frames):
     wf.writeframes(b''.join(frames))
     wf.close()
 
-def restart(output, p, stream, frames):
-    save(output, p, frames)
-    """
-    p = pyaudio.PyAudio()
-    stream = p.open(format=FORMAT,
-                  channels=CHANNELS,
-                  rate=RATE,
-                  input=True,
-                  frames_per_buffer=CHUNK)
-                  """
-    return []
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -69,7 +57,8 @@ if __name__ == '__main__':
             over = 60 if cur_min < last_min else 0
             if (cur_min+over) - last_min > 20:
                 last_min = cur_min
-                frames = restart(args.path + "/audio" + args.suffix + "-" + str(count) + ".wav", p, stream, frames)
+                save(args.path + "/audio" + args.suffix + "-" + str(count) + ".wav", p, frames)
+                frames = []
                 count = count + 1
                 continue
 

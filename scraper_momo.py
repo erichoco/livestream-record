@@ -21,7 +21,7 @@ import recording.screencast as screencast
 
 def init_driver():
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--mute-audio")
+    # chrome_options.add_argument("--mute-audio")
     # chrome_options.add_argument("--start-maximized")
     driver = webdriver.Chrome('driver/chromedriver', chrome_options=chrome_options)
     # calling driver.wait.until would wait 5s for the element to be loaded before throwing exception
@@ -172,7 +172,7 @@ def crawl_star(stars):
 def crawl_viewer_num(view_num):
     try:
         new_item = driver.find_element_by_css_selector("p.onWatch")
-        new_item = (int)(new_item.text[:-2])
+        new_item = new_item.text[:-2]
 
         if not view_num or new_item != view_num[-1]["num"]:
             view_num.append({
@@ -189,8 +189,6 @@ def crawl_viewer_num(view_num):
     return view_num
 
 def crawl_info(info):
-    if info is None:
-        print("Oh no")
     try:
         info["messages"] = crawl_messages(info["messages"])
         info["gifts"] = crawl_gifts(info["gifts"])
@@ -199,21 +197,8 @@ def crawl_info(info):
     except:
         raise
 
-    # cur = time.time()
-    # info["messages"] += [(cur, m) for m in new_messages]
-    # info["gifts"] += [(cur, g) for g in new_gifts]
-    # if new_star:
-    #     info["stars"].append((cur, new_star))
-    # if new_view_num:
-    #     info["view_nums"].append((cur, new_view_num))
     return info
-    # new_info = {
-    #     "messages": new_messages,
-    #     "gifts": new_gifts,
-    #     "star": new_star,
-    #     "view_num": new_view_num
-    # }
-    # return info, new_info
+
 
 # Process CSV
 
@@ -259,8 +244,9 @@ def save_info(writer, info, type, start_time):
 def save_info_partial(writer, info, type, start_time):
     cur = time.time()
     idx = 0
-    for i, v in enumerate(info):
-        if time.gmtime(cur - v["time"])[4] < 0:
+    for (i, v) in enumerate(info):
+        # print(i, v["time"])
+        if time.gmtime(cur - v["time"])[4] < 1:
             idx = i
             break
     save_info(writer, info[:idx], type, start_time)
@@ -273,29 +259,13 @@ def save_csv(write, info):
     save_info(writer, info["messages"], "message", info["start_time"])
 
 def save_csv_partial(writer, info):
-    # timestamp = time.strftime("%m-%d_%H:%M:%S", time.gmtime())
-    # diff = round(time.time()) - info["start_time"]
-    # time_elapsed = "{hour:02d}:{min:02d}:{sec:02d}".format(
-    #     hour=int(diff//3600)%3600,
-    #     min=int((diff//60)%60),
-    #     sec=int(diff%60))
+    print("saving csv")
     info["view_nums"] = save_info_partial(writer, info["view_nums"], "viewers", info["start_time"])
     info["stars"] = save_info_partial(writer, info["stars"], "stars", info["start_time"])
     info["gifts"] = save_info_partial(writer, info["gifts"], "gift", info["start_time"])
     info["messages"] = save_info_partial(writer, info["messages"], "message", info["start_time"])
     return info
 
-
-    # if new_info["view_num"]:
-    #     writer.writerow([timestamp, time_elapsed, "viewers", "", "", new_info["view_num"]["num"]])
-    # if new_info["star"]:
-    #     writer.writerow([timestamp, time_elapsed, "stars", "", "", new_info["star"]["star"]])
-    # if new_info["gifts"]:
-    #     for g in new_info["gifts"]:
-    #         writer.writerow([timestamp, time_elapsed, "gift", g["name"], g["gift"], g["count"]])
-    # if new_info["messages"]:
-    #     for m in new_info["messages"]:
-    #         writer.writerow([timestamp, time_elapsed, "message", m["name"], m["message"]])
 
 # Main
 
@@ -321,6 +291,8 @@ if __name__ == "__main__":
     driver = init_driver()
     cur_time = time.strftime("_%m-%d_%H-%M-%S", time.gmtime())
     screen = screencast.Screencast(path, cur_time)
+
+    start_time = time.time()
 
     if load_chat_box(driver, room_url, chat_box_class_name):
         bring_browser_to_front(driver)
@@ -350,6 +322,9 @@ if __name__ == "__main__":
                 # press 'q' & 'return' to break
                 if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
                     save_csv(writer, info)
+                    raise KeyboardInterrupt
+
+                if time.gmtime(time.time() - start_time)[3] > 1:
                     raise KeyboardInterrupt
 
 
