@@ -41,8 +41,7 @@ if __name__ == '__main__':
                   frames_per_buffer=CHUNK)
     frames = []
 
-    exiting = False
-
+    start_time = time.time()
     last_min = time.gmtime()[4]
     count = 0
 
@@ -65,12 +64,13 @@ if __name__ == '__main__':
             if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
                 raise KeyboardInterrupt
 
+            if time.gmtime(time.time() - start_time)[3] > 1:
+                raise KeyboardInterrupt
+
     except KeyboardInterrupt:
-        stop_save(args.path + "/audio" + args.suffix + ".wav", p, stream, frames)
-        exit(0)
-
-
+        pass
     except Exception as e:
-        stop_save(args.path + "/audio" + args.suffix + ".wav", p, stream, frames)
         print(e)
-        exit(0)
+
+    stop_save(args.path + "/audio" + args.suffix + ".wav", p, stream, frames)
+    exit(0)
