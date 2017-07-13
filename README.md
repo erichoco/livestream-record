@@ -3,6 +3,6 @@ Recording activities from live-streaming video sites.
 
 Supporting:
 - [x] [Momo](https://web.immomo.com/) (Chinese)
+- [x] [Inke](http://inke.cn/hotlive_list.html) (Chinese)
 - [ ] [Twitch](https://www.twitch.tv/)
-- [ ] [Huya](http://www.huya.com/) (Chinese)
-- [ ] [Panda](http://www.panda.tv/) (Chinese)
+- [ ] [Live.me](https://www.liveme.com/)
