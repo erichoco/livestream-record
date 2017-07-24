@@ -21,9 +21,8 @@ import recording.screencast as screencast
 
 def init_driver():
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--mute-audio')
-    driver = webdriver.Chrome('driver/chromedriver',
-        chrome_options=chrome_options)
+    # chrome_options.add_argument('--mute-audio')
+    driver = webdriver.Chrome('driver/chromedriver', chrome_options=chrome_options)
     # calling driver.wait.until would wait 5s for the element to be loaded before throwing exception
     driver.wait = WebDriverWait(driver, 5)
     return driver
@@ -254,7 +253,7 @@ if __name__ == '__main__':
     start_time = time.time()
     start_time_str = time.strftime('_%m-%d_%H-%M-%S', time.gmtime())
 
-    bring_browser_to_front(driver)
+    # bring_browser_to_front(driver)
 
     # capture screen & audio
     screen = screencast.Screencast(path, start_time_str)

@@ -295,7 +295,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     if load_chat_box(driver, room_url, chat_box_class_name):
-        bring_browser_to_front(driver)
+        # bring_browser_to_front(driver)
         # capture screen & audio
         screen.start()
         audio = subprocess.Popen(['python3', 'recording/audiocast.py', '-p', path, '-s', cur_time])
