@@ -23,6 +23,9 @@ def init_driver():
     chrome_options = webdriver.ChromeOptions()
     # chrome_options.add_argument("--mute-audio")
     # chrome_options.add_argument("--start-maximized")
+    prefs = {}
+    prefs['profile.default_content_setting_values.plugins'] = 1
+    chrome_options.add_experimental_option('prefs', prefs)
     driver = webdriver.Chrome('driver/chromedriver', chrome_options=chrome_options)
     # calling driver.wait.until would wait 5s for the element to be loaded before throwing exception
     driver.wait = WebDriverWait(driver, 5)
@@ -153,9 +156,9 @@ def crawl_gifts(gifts):
 def crawl_star(stars):
     try:
         new_item = driver.find_element_by_css_selector("strong.starNum.star")
-        new_item = (int)(new_item.text)
+        new_item = new_item.text
 
-        if not stars or new_item > stars[-1]["star"]:
+        if not stars or new_item != stars[-1]["star"]:
             stars.append({
                 "time": time.time(),
                 "star": new_item
