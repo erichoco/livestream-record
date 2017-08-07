@@ -20,11 +20,10 @@ import recording.screencast as screencast
 # Selenium
 
 def init_driver():
-    chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_argument("--mute-audio")
-    # chrome_options.add_argument("--start-maximized")
     prefs = {}
     prefs['profile.default_content_setting_values.plugins'] = 1
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--mute-audio")
     chrome_options.add_experimental_option('prefs', prefs)
     driver = webdriver.Chrome('driver/chromedriver', chrome_options=chrome_options)
     # calling driver.wait.until would wait 5s for the element to be loaded before throwing exception
@@ -45,15 +44,6 @@ def load_chat_box(driver, url, class_name):
 def bring_browser_to_front(driver):
     driver.execute_script('alert(1);')
     driver.switch_to_alert().accept()
-
-def prepare_cast(driver, screen, room_url, chat_box_class_name):
-    if load_chat_box(driver, room_url, chat_box_class_name):
-        bring_browser_to_front(driver)
-        # capture screen & audio
-        screen.start()
-        audio = subprocess.Popen(['python3', 'recording/audiocast.py', '-p', path, '-s', cur_time])
-        return screen
-    return None
 
 def teardown(driver):
     driver.quit()
@@ -301,14 +291,13 @@ if __name__ == "__main__":
         # bring_browser_to_front(driver)
         # capture screen & audio
         screen.start()
-        audio = subprocess.Popen(['python3', 'recording/audiocast.py', '-p', path, '-s', cur_time])
+        # audio = subprocess.Popen(['python3', 'recording/audiocast.py', '-p', path, '-s', cur_time])
     else:
         teardown(driver)
         exit(0)
 
     try:
         with open(path + "/data" + cur_time + ".csv", "w", newline="", encoding="utf-8") as csvfile:
-        # with open(path + "/data" + cur_time + ".csv", "w") as csvfile: # python 2
             writer = csv.writer(csvfile, delimiter=",")
             writer.writerow(["timestamp", "time", "event", "value_1", "value_2", "value_3"])
 
