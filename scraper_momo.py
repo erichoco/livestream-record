@@ -278,29 +278,25 @@ if __name__ == "__main__":
 
     room_url = "https://web.immomo.com/live/" + sys.argv[1] + "?rf=683"
     chat_box_class_name = "live-msg-list"
-
+    driver = init_driver()    
+    if not load_chat_box(driver, room_url, chat_box_class_name):
+        driver.quit()
+        exit(0)
+        
     info = init_info(room_url)
     path = init_csv(info)
-    driver = init_driver()
-    cur_time = time.strftime("_%m-%d_%H-%M-%S", time.gmtime())
-    screen = screencast.Screencast(path, cur_time)
-
     start_time = time.time()
+    cur_time = time.strftime("_%m-%d_%H-%M-%S", time.gmtime())
 
-    if load_chat_box(driver, room_url, chat_box_class_name):
-        # bring_browser_to_front(driver)
-        # capture screen & audio
-        screen.start()
-        # audio = subprocess.Popen(['python3', 'recording/audiocast.py', '-p', path, '-s', cur_time])
-    else:
-        teardown(driver)
-        exit(0)
+    screen = screencast.Screencast(path, cur_time)
+    screen.start()
+    # audio = subprocess.Popen(['python3', 'recording/audiocast.py', '-p', path, '-s', cur_time])
 
-    try:
-        with open(path + "/data" + cur_time + ".csv", "w", newline="", encoding="utf-8") as csvfile:
-            writer = csv.writer(csvfile, delimiter=",")
-            writer.writerow(["timestamp", "time", "event", "value_1", "value_2", "value_3"])
+    with open(path + "/data" + cur_time + ".csv", "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile, delimiter=",")
+        writer.writerow(["timestamp", "time", "event", "value_1", "value_2", "value_3"])
 
+        try:
             last_crawl = time.gmtime()[5] # get current second
             last_save = time.gmtime()[4]
             while True:
@@ -316,16 +312,15 @@ if __name__ == "__main__":
                     save_csv(writer, info)
                     raise KeyboardInterrupt
 
+                # break after 2 hrs
                 if time.gmtime(time.time() - start_time)[3] > 1:
                     raise KeyboardInterrupt
 
-
-    except KeyboardInterrupt:
-        screen.stop()
-        teardown(driver)
-
-    except Exception as e:
-        screen.stop()
-        teardown(driver)
-        print("Unknown Exception")
-        print(e)
+        except KeyboardInterrupt:
+            pass
+        except Exception as e:
+            print("Unknown Exception")
+            print(e)
+    
+    screen.stop()
+    driver.quit()
