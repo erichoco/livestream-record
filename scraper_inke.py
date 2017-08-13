@@ -21,7 +21,7 @@ import recording.screencast as screencast
 
 def init_driver():
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--mute-audio')
+    # chrome_options.add_argument('--mute-audio')
     driver = webdriver.Chrome('driver/chromedriver',
         chrome_options=chrome_options)
     # calling driver.wait.until would wait 5s for the element to be loaded before throwing exception

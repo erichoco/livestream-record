@@ -153,9 +153,9 @@ def crawl_gifts(gifts):
 def crawl_star(stars):
     try:
         new_item = driver.find_element_by_css_selector("strong.starNum.star")
-        new_item = (int)(new_item.text)
+        new_item = new_item.text
 
-        if not stars or new_item > stars[-1]["star"]:
+        if not stars or new_item != stars[-1]["star"]:
             stars.append({
                 "time": time.time(),
                 "star": new_item
