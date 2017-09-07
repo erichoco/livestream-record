@@ -4,7 +4,6 @@ import select
 import signal
 import time
 import re
-import subprocess
 import csv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -13,9 +12,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
-
-import recording.screencast as screencast
-
 
 # Selenium
 
@@ -256,11 +252,6 @@ if __name__ == '__main__':
 
     bring_browser_to_front(driver)
 
-    # capture screen & audio
-    screen = screencast.Screencast(path, start_time_str)
-    screen.start()
-    audio = subprocess.Popen(['python3', 'recording/audiocast.py', '-p', path, '-s', start_time_str])
-
     with open(path + '/data' + start_time_str + '.csv', 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         writer.writerow(['timestamp', 'time', 'event', 'value_1', 'value_2', 'value_3'])
@@ -292,5 +283,4 @@ if __name__ == '__main__':
             print('Unknown Exception')
             print(e)
 
-    screen.stop()
     driver.quit()
