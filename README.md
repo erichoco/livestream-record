@@ -26,10 +26,15 @@ to record messsages and gifts.
 
 ### Recording Video & Audio
 Go to System Preferences > Sound > Output tab
+
 Select **Soundflower (64ch)**
-![](https://imgur.com/a/XYexy)
+
+![](https://i.imgur.com/ie4dDcY.png)
 
 Open QuickTime Player, go to File > New Screen Recording
+
 At the right of the recording button, click to open a dropdown menu
+
 Select **Soundflower (64ch)**
-![](https://imgur.com/a/cD0Ng)
+
+![](https://i.imgur.com/iCkKnxI.png)
